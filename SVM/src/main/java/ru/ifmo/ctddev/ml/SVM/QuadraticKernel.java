@@ -11,7 +11,7 @@ public class QuadraticKernel implements Kernel {
             for (int j = 0; j < x.length; j++) {
                 result += (x[i] * x[j] * y[i] * y[j]);
             }
-        }
+        }/**/
         return (1 + result) * (1 + result);
     }
 }

@@ -11,7 +11,7 @@ public class LinearKernel implements Kernel {
             for (int j = 0; j < x.length; j++) {
                 result += (x[i] * x[j] * y[i] * y[j]);
             }
-        }
+        }/**/
         return result;
     }
 }

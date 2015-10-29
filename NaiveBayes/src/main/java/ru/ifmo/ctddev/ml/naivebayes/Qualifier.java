@@ -1,9 +1,9 @@
-package ru.ifmo.ctddev.varlamov.ml.naivebayes;
+package ru.ifmo.ctddev.ml.naivebayes;
 
 import java.util.List;
 
 public class Qualifier {
-    private static final int FALSE_POSITIVE = 30, FALSE_NEGATIVE = 1;
+    private static final int FALSE_POSITIVE = 25, FALSE_NEGATIVE = 1;
     public static double getError(NaiveBayes nb, List<Letter> test) {
         int error = 0;
         for (Letter letter: test) {

@@ -1,4 +1,4 @@
-package ru.ifmo.ctddev.varlamov.ml.naivebayes;
+package ru.ifmo.ctddev.ml.naivebayes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class NaiveBayes {
     private static final double THRESHOLD = 0.999;
-    private static final int SUBJECT_COEF = 1;
-    private static final double STUB_FOR_MISSING = -45;
+    private static final int SUBJECT_COEF = 5;
+    private static final double STUB_FOR_MISSING = -40;
     private final Map<Integer, Double> logSpam = new HashMap<>(), logNonSpam = new HashMap<>();
     private final double logSpamRate;
 

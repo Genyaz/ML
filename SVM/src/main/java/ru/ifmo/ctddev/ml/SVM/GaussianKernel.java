@@ -17,7 +17,7 @@ public class GaussianKernel implements Kernel {
             for (int j = 0; j < x.length; j++) {
                 e += (x[i] * x[j] - y[i] * y[j]) * (x[i] * x[j] - y[i] * y[j]);
             }
-        }
+        }/**/
         return Math.exp(-e / (2 * sigma * sigma));
     }
 }

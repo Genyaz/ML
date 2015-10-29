@@ -1,4 +1,4 @@
-package ru.ifmo.ctddev.varlamov.ml;
+package ru.ifmo.ctddev.ml;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

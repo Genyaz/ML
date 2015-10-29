@@ -1,4 +1,4 @@
-package ru.ifmo.ctddev.varlamov.ml.naivebayes;
+package ru.ifmo.ctddev.ml.naivebayes;
 
 import java.io.*;
 import java.util.*;

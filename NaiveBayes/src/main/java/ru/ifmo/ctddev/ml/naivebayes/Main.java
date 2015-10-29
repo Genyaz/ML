@@ -1,4 +1,4 @@
-package ru.ifmo.ctddev.varlamov.ml.naivebayes;
+package ru.ifmo.ctddev.ml.naivebayes;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.*;
 public class Main {
 
     public static final double VAL_RATIO = 0.2;
-    public static final int CV_FOLDS = 5;
+    public static final int CV_FOLDS = 10;
 
     public static void main(String[] args) throws IOException {
         File dir = new File("./src/main/res/pu1");

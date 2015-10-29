@@ -22,10 +22,21 @@ public class SVM {
         this.lambdas = lambdas;
         this.k = k;
         double b = 0;
+        double bPos = 0, bNeg = 0;
+        int bPosCount = 0, bNegCount = 0;
         for (int i = 0; i < m; i++) {
-            b += getMetric(Arrays.copyOf(trainset[i], n));
+            double m = getMetric(Arrays.copyOf(trainset[i], n));
+            if (trainset[i][n] > 0) {
+                bPos += m;
+                bPosCount++;
+            } else {
+                bNeg += m;
+                bNegCount++;
+            }
+            b += m;
         }
-        this.b = b / m;
+        //this.b = b / m;
+        this.b = (bPos / bPosCount + bNeg / bNegCount);
         //System.out.println("b = " + b / m);
     }
 
@@ -85,16 +96,16 @@ public class SVM {
         or.setF0(objectiveFunction);
         or.setInitialPoint(lambdas);
         or.setFi(inequalities);
-        or.setToleranceFeas(1.E-1);
-        or.setTolerance(1.E-1);
+        or.setToleranceFeas(1.E-3);
+        or.setTolerance(1.E-3);
 
         //optimization
         JOptimizer opt = new JOptimizer();
         opt.setOptimizationRequest(or);
         int returnCode = opt.optimize();
         lambdas = opt.getOptimizationResponse().getSolution();
-        //System.out.println("Objective function = " + objectiveFunction.value(lambdas));
-        //System.out.println("Lambdas: " + Arrays.toString(lambdas));
+        System.out.println("Objective function = " + objectiveFunction.value(lambdas));
+        System.out.println("Lambdas: " + Arrays.toString(lambdas));
         /*double res = 0;
         for (int i = 0; i < m; i++) {
             res += trainset[i][n] * lambdas[i];
@@ -115,7 +126,7 @@ public class SVM {
     private double getMetric(double[] x) {
         double result = 0;
         for (int i = 0; i < m; i++) {
-            result += lambdas[i] * trainset[i][n] * k.product(x, trainset[i]);
+            result += lambdas[i] * trainset[i][n] * k.product(Arrays.copyOf(x, x.length - 1), trainset[i]);
         }
         return result;
     }

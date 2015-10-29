@@ -20,7 +20,20 @@ public class Qualifier {
     public static Error getError(SVM svm, List<double[]> test) {
         int tp = 0, tn = 0, fn = 0, fp = 0;
         for (double[] x: test) {
-            if (svm.classify(x) < 0) {
+            if (x[x.length - 1] < 0) {
+                if (svm.classify(x) < 0) {
+                    tn++;
+                } else {
+                    fp++;
+                }
+            } else {
+                if (svm.classify(x) < 0) {
+                    fn++;
+                } else {
+                    tp++;
+                }
+            }
+            /*if (svm.classify(x) < 0) {
                 if (x[x.length - 1] < 0) {
                     tn++;
                 } else {
@@ -32,7 +45,7 @@ public class Qualifier {
                 } else {
                     tp++;
                 }
-            }
+            }/**/
         }
         return new Error(tp, tn, fp, fn);
     }
