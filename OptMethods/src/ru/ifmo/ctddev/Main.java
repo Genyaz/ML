@@ -45,5 +45,10 @@ public class Main {
         System.out.println(Arrays.toString(result.result.x));
         System.out.println(result.result.quality);
         System.out.println(result.totalIterations);
+        GeneticAlgorithm ga = new GeneticAlgorithm(new double[][]{{-8, 8}, {-8, 8}}, 20, 0.1, 0.1, 0.5, 0.1, 0.1);
+        result = ga.getOptimization(evaluator, 2);
+        System.out.println(Arrays.toString(result.result.x));
+        System.out.println(result.result.quality);
+        System.out.println(result.totalIterations);
     }
 }
