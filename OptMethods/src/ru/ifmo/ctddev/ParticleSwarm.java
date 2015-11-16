@@ -84,4 +84,9 @@ public class ParticleSwarm extends OptimizationMethod {
         Arrays.sort(swarm);
         return swarm[swarmSize - 1];
     }
+
+    @Override
+    public String getName() {
+        return "Particle swarm";
+    }
 }

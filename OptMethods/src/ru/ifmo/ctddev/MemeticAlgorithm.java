@@ -5,15 +5,17 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Function;
 
-public class GeneticAlgorithm extends OptimizationMethod {
+public class MemeticAlgorithm extends OptimizationMethod {
 
     private final double[][] boundaries;
-    private final double mutationCoef, mutationRate, selection, elite, diff;
-    private final int populationSize;
+    private final double mutationCoef, mutationRate, selection, elite, diff, indOptProb, indOptStep;
+    private final int populationSize, indOptIter;
     private final Random r;
 
-    public GeneticAlgorithm(double[][] boundaries, int populationSize,
-                            double mutationCoef, double mutationRate, double selection, double elite, double diff) {
+    public MemeticAlgorithm(double[][] boundaries, int populationSize,
+            double mutationCoef, double mutationRate, double selection,
+            double elite, double diff, double indOptProb, int indOptIter,
+            double indOptStep) {
         this.boundaries = boundaries;
         this.populationSize = populationSize;
         this.mutationCoef = mutationCoef;
@@ -21,6 +23,9 @@ public class GeneticAlgorithm extends OptimizationMethod {
         this.selection = selection;
         this.elite = elite;
         this.diff = diff;
+        this.indOptIter = indOptIter;
+        this.indOptProb = indOptProb;
+        this.indOptStep = indOptStep;
         this.r = new Random(System.currentTimeMillis());
     }
 
@@ -102,11 +107,34 @@ public class GeneticAlgorithm extends OptimizationMethod {
                 nextGen[eliteSize + i].quality = evaluator.apply(x);
             }
             population = nextGen;
+            for (int i = 0; i < populationSize; i++) {
+                if (r.nextDouble() < indOptProb) {
+                    Point best = population[i];
+                    for (int t = 0; t < indOptIter; t++) {
+                        for (int j = 0; j < arity; j++) {
+                            best.x[j] += indOptStep;
+                            Point plusStep = new Point(best.x);
+                            plusStep.quality = evaluator.apply(plusStep.x);
+                            best.x[j] -= 2 * indOptStep;
+                            Point minusStep = new Point(best.x);
+                            minusStep.quality = evaluator.apply(minusStep.x);
+                            best.x[j] += indOptStep;
+                            if (plusStep.quality > best.quality) {
+                                best = plusStep;
+                            }
+                            if (minusStep.quality > best.quality) {
+                                best = minusStep;
+                            }
+                        }
+                    }
+                    population[i] = best;
+                }
+            }
         }
     }
 
     @Override
     public String getName() {
-        return "Genetic algorithm";
+        return "Memetic algorithm";
     }
 }

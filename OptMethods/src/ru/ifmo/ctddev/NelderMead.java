@@ -139,4 +139,9 @@ public class NelderMead extends OptimizationMethod {
         executorService.shutdown();
         return points[arity];
     }
+
+    @Override
+    public String getName() {
+        return "Nelder-Mead";
+    }
 }

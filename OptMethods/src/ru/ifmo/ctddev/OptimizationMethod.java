@@ -60,6 +60,8 @@ public abstract class OptimizationMethod {
 
     protected abstract Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out);
 
+    public abstract String getName();
+
     public OptimizationResult getOptimization(Function<double[], Double> evaluator, int arity, PrintStream out) {
         EvaluatorProxy evaluatorProxy = new EvaluatorProxy(evaluator);
         Point point = optimize(evaluatorProxy, arity, out);
