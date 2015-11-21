@@ -47,7 +47,7 @@ public class ParticleSwarm extends OptimizationMethod {
             swarm[i] = new Particle(x, v);
             swarm[i].quality = evaluator.apply(x);
             swarm[i].bestKnown.quality = swarm[i].quality;
-            if (best == null || swarm[i].quality > best.quality) {
+            if (best == null || swarm[i].quality < best.quality) {
                 best = swarm[i];
             }
         }
@@ -71,18 +71,18 @@ public class ParticleSwarm extends OptimizationMethod {
                     swarm[i].x[j] += swarm[i].v[j];
                 }
                 swarm[i].quality = evaluator.apply(swarm[i].x);
-                if (swarm[i].quality > swarm[i].bestKnown.quality) {
+                if (swarm[i].quality < swarm[i].bestKnown.quality) {
                     swarm[i].bestKnown = new Point(swarm[i].x);
                     swarm[i].bestKnown.quality = swarm[i].quality;
                 }
-                if (swarm[i].quality > best.quality) {
+                if (swarm[i].quality < best.quality) {
                     best = new Point(swarm[i].x);
                     best.quality = swarm[i].quality;
                 }
             }
         }
         Arrays.sort(swarm);
-        return swarm[swarmSize - 1];
+        return swarm[0];
     }
 
     @Override

@@ -28,11 +28,11 @@ public class LocalSearch extends OptimizationMethod {
                 Point minusStep = new Point(best.x);
                 minusStep.quality = evaluator.apply(minusStep.x);
                 best.x[i] += step;
-                if (plusStep.quality > best.quality) {
+                if (plusStep.quality < best.quality) {
                     best = plusStep;
                     improved = true;
                 }
-                if (minusStep.quality > best.quality) {
+                if (minusStep.quality < best.quality) {
                     best = minusStep;
                     improved = true;
                 }

@@ -70,7 +70,7 @@ public class NelderMead extends OptimizationMethod {
             }
             if (maxDist < eps * eps) break;
             double[] cm = new double[arity];
-            for (int i = 1; i < arity + 1; i++) {
+            for (int i = 0; i < arity; i++) {
                 for (int j = 0; j < arity; j++) {
                     cm[j] += points[i].x[j];
                 }
@@ -80,45 +80,45 @@ public class NelderMead extends OptimizationMethod {
             }
             double[] refl = new double[arity];
             for (int j = 0; j < arity; j++) {
-                refl[j] = (1 + alpha) * points[0].x[j] - alpha * cm[j];
+                refl[j] = (1 + alpha) * points[arity].x[j] - alpha * cm[j];
             }
             Point reflected = new Point(refl);
             reflected.quality = evaluator.apply(refl);
-            if (reflected.quality > points[1].quality && reflected.quality <= points[arity].quality) {
-                points[0] = reflected;
+            if (reflected.quality < points[arity - 1].quality && reflected.quality >= points[0].quality) {
+                points[arity] = reflected;
                 continue;
             }
-            if (reflected.quality > points[arity].quality) {
+            if (reflected.quality < points[0].quality) {
                 double[] exp = new double[arity];
                 for (int j = 0; j < arity; j++) {
-                    exp[j] = (1 + gamma) * points[0].x[j] - gamma * cm[j];
+                    exp[j] = (1 + gamma) * points[arity].x[j] - gamma * cm[j];
                 }
                 Point expanded = new Point(exp);
                 expanded.quality = evaluator.apply(exp);
-                if (expanded.quality > reflected.quality) {
-                    points[0] = expanded;
+                if (expanded.quality < reflected.quality) {
+                    points[arity] = expanded;
                 } else {
-                    points[0] = reflected;
+                    points[arity] = reflected;
                 }
                 continue;
             }
             double[] cont = new double[arity];
             for (int j = 0; j < arity; j++) {
-                cont[j] = (1 + p) * points[0].x[j] - p * cm[j];
+                cont[j] = (1 + p) * points[arity].x[j] - p * cm[j];
             }
             Point contracted = new Point(cont);
             contracted.quality = evaluator.apply(cont);
-            if (contracted.quality > points[0].quality) {
-                points[0] = contracted;
+            if (contracted.quality < points[arity].quality) {
+                points[arity] = contracted;
                 continue;
             }
-            double[] reductionCenter = points[arity].x;
-            for (int i = 0; i < arity; i++) {
+            double[] reductionCenter = points[0].x;
+            for (int i = 1; i <= arity; i++) {
                 for (int j = 0; j < arity; j++) {
                     points[i].x[j] = (1 - sigma) * reductionCenter[j] + sigma * points[i].x[j];
                 }
             }
-            for (int i = 0; i < arity; i++) {
+            for (int i = 1; i <= arity; i++) {
                 final Point p = points[i];
                 executorService.execute(() -> {
                     p.quality = evaluator.apply(p.x);
@@ -137,7 +137,7 @@ public class NelderMead extends OptimizationMethod {
             }
         }
         executorService.shutdown();
-        return points[arity];
+        return points[0];
     }
 
     @Override

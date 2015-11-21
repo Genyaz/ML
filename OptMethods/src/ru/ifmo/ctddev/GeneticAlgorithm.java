@@ -7,10 +7,10 @@ import java.util.function.Function;
 
 public class GeneticAlgorithm extends OptimizationMethod {
 
-    private final double[][] boundaries;
-    private final double mutationCoef, mutationRate, selection, elite, diff;
-    private final int populationSize;
-    private final Random r;
+    protected final double[][] boundaries;
+    protected final double mutationCoef, mutationRate, selection, elite, diff;
+    protected final int populationSize;
+    protected final Random r;
 
     public GeneticAlgorithm(double[][] boundaries, int populationSize,
                             double mutationCoef, double mutationRate, double selection, double elite, double diff) {
@@ -25,18 +25,19 @@ public class GeneticAlgorithm extends OptimizationMethod {
     }
 
     protected Point chooseParent(Point[] breeding) {
-        double sumQuality = 0;
-        double minQuality = Double.MAX_VALUE;
+        double maxQuality = Double.MIN_VALUE;
         for (Point p : breeding) {
-            sumQuality += p.quality;
-            minQuality = Math.min(minQuality, p.quality);
+            maxQuality = Math.max(maxQuality, p.quality);
         }
-        sumQuality -= minQuality * breeding.length;
+        double sumQuality = 0;
+        for (Point p: breeding) {
+            sumQuality += (maxQuality - p.quality);
+        }
         double q = r.nextDouble() * sumQuality;
         int j = 0;
         sumQuality = 0;
-        while (j < breeding.length - 1 && sumQuality + (breeding[j].quality - minQuality) < q) {
-            sumQuality += breeding[j].quality - minQuality;
+        while (j < breeding.length - 1 && sumQuality + (maxQuality - breeding[j].quality) < q) {
+            sumQuality += (maxQuality - breeding[j].quality);
             j++;
         }
         return breeding[j];
@@ -87,13 +88,14 @@ public class GeneticAlgorithm extends OptimizationMethod {
         final int selectionSize = (int)(selection * populationSize);
         while (true) {
             Arrays.sort(population);
+            //out.println(population[0].quality + " " + population[populationSize - 1].quality);
             if (population[populationSize - 1].quality - population[0].quality < diff) {
-                return population[populationSize - 1];
+                return population[0];
             }
-            Point[] breeding = Arrays.copyOfRange(population, populationSize - selectionSize, populationSize);
+            Point[] breeding = Arrays.copyOfRange(population, 0, selectionSize);
             Point[] nextGen = new Point[populationSize];
             for (int i = 0; i < eliteSize; i++) {
-                nextGen[i] = population[populationSize - eliteSize + i];
+                nextGen[i] = population[i];
             }
             for (int i = 0; i < populationSize - eliteSize; i++) {
                 Point parent1 = chooseParent(breeding), parent2 = chooseParent(breeding);
