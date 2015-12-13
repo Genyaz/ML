@@ -1,7 +1,5 @@
 package ru.ifmo.ctddev.ml.logreg;
 
-import sun.rmi.runtime.Log;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,9 +7,8 @@ import java.util.List;
 
 public class Main {
 
-    public static final double VAL_RATIO = 0.1;
+    public static final double VAL_RATIO = 0.2;
     public static final int CV_FOLDS = 5;
-    public static final double C = 1;
     public static void main(String[] args) throws Exception {
         List<double[]> data = DatasetReader.readFrom(new File("./res/chips.txt"));
         Collections.shuffle(data);
@@ -26,11 +23,16 @@ public class Main {
             double[][] array = train.toArray(new double[0][]);
             totalError = totalError.add(Qualifier.getError(LogisticRegression.train(array, 0.01, 0.01, 1), check));
         }
-        System.out.println("Cross-validation:");
+        System.out.println("Cross-validation: ");
         System.out.println("True positive: " + totalError.tp);
         System.out.println("True negative: " + totalError.tn);
         System.out.println("False positive: " + totalError.fp);
         System.out.println("False negative: " + totalError.fn);
+        double precision = totalError.tp * 1.0 / (totalError.tp + totalError.fp);
+        double recall = totalError.tp * 1.0 / (totalError.tp + totalError.fn);
+        System.out.println("Precision: " + precision);
+        System.out.println("Recall: " + recall);
+        System.out.println("F1: " + (2 * recall * precision / (recall + precision)));
         double[][] array = test.toArray(new double[0][]);
         LogisticRegression svm = LogisticRegression.train(array, 0.01, 0.01, 1);
         totalError = Qualifier.getError(svm, validation);
@@ -39,5 +41,10 @@ public class Main {
         System.out.println("True negative: " + totalError.tn);
         System.out.println("False positive: " + totalError.fp);
         System.out.println("False negative: " + totalError.fn);
+        precision = totalError.tp * 1.0 / (totalError.tp + totalError.fp);
+        recall = totalError.tp * 1.0 / (totalError.tp + totalError.fn);
+        System.out.println("Precision: " + precision);
+        System.out.println("Recall: " + recall);
+        System.out.println("F1: " + (2 * recall * precision / (recall + precision)));
     }
 }

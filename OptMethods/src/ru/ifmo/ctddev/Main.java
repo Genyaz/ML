@@ -45,20 +45,20 @@ public class Main {
             }
         });
         List<OptimizationMethod> optimizationMethods = new ArrayList<>();
-        optimizationMethods.add(new NelderMead(1, 2, -0.5, 0.5, new double[][]{{-8, 8}, {-8, -8}, {16, 0}}, 0.001, 0.05, 8));
-        optimizationMethods.add(new LocalSearch(0.1, new double[]{2, 2}));
-        optimizationMethods.add(new ParticleSwarm(0.6, 0.4, 1.4, new double[][]{{-8, 8}, {-8, 8}}, 4, 0.1));
-        optimizationMethods.add(new GeneticAlgorithm(new double[][]{{-8, 8}, {-8, 8}}, 20, 0.1, 0.1, 0.5, 0.1, 0.1));
-        optimizationMethods.add(new MemeticAlgorithm(new double[][]{{-8, 8}, {-8, 8}}, 20, 0.1, 0.1, 0.5, 0.1, 0.1, 0.5, 1, 1));
-        optimizationMethods.add(new FireflyAlgorithm(new double[][]{{-8, 8}, {-8, 8}}, 20, 15, 0.1, 1, 1, 0.1));
-        optimizationMethods.add(new GlowwormSwarm(new double[][]{{-8, 8}, {-8, 8}}, 20, 15, 0, 2, 8, 0.1, 5, 0.5, 2, 1, 0.1));
+        optimizationMethods.add(new NelderMead());
+        optimizationMethods.add(new LocalSearch());
+        optimizationMethods.add(new ParticleSwarm());
+        optimizationMethods.add(new GeneticAlgorithm());
+        optimizationMethods.add(new MemeticAlgorithm());
+        optimizationMethods.add(new FireflyAlgorithm());
+        optimizationMethods.add(new GlowwormSwarm());
         for (Function<double[], Double> f : testFunctions) {
             for (OptimizationMethod om : optimizationMethods) {
-                OptimizationMethod.OptimizationResult result = om.getOptimization(f, 2);
+                OptimizationMethod.OptimizationResult result = om.optimize(f, 2, true);
                 System.out.println(om.getName());
                 System.out.println(Arrays.toString(result.result.x));
                 System.out.println(result.result.quality);
-                System.out.println(result.totalIterations);
+                System.out.println(result.log.size());
             }
             System.out.println();
         }

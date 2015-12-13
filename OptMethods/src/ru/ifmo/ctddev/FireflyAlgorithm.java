@@ -5,17 +5,31 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Function;
 
+/**
+ * The optimization method based on the behaviour of fireflies.
+ * Current realization is written according to the article
+ *
+ * http://arxiv.org/pdf/1003.1464.pdf
+ */
 public class FireflyAlgorithm extends OptimizationMethod {
 
+    /**
+     * Represents a firefly.
+     */
     protected static class Firefly extends Point {
         public Firefly(double[] x) {
             super(x);
         }
 
-        public double distTo(Firefly f) {
+        /**
+         * Returns euclidean distance to other firefly.
+         * @param other other firefly
+         * @return euclidean distance
+         */
+        public double distTo(Firefly other) {
             double sqrDist = 0;
             for (int i = 0; i < x.length; i++) {
-                sqrDist += (x[i] - f.x[i]) * (x[i] - f.x[i]);
+                sqrDist += (x[i] - other.x[i]) * (x[i] - other.x[i]);
             }
             return Math.sqrt(sqrDist);
         }
@@ -26,7 +40,13 @@ public class FireflyAlgorithm extends OptimizationMethod {
     private final int swarmSize, maxIterations;
     private Random r;
 
-    protected double[] randomMove(int arity) {
+    /**
+     * Uniform random step made by firefly.
+     * @param arity dimensionality of the search space
+     * @param alpha maximum size of the step in each dimension
+     * @return random step
+     */
+    protected double[] randomMove(int arity, double alpha) {
         double[] result = new double[arity];
         for (int i = 0; i < arity; i++) {
             result[i] = (r.nextDouble() * 2 - 1) * alpha;
@@ -34,7 +54,18 @@ public class FireflyAlgorithm extends OptimizationMethod {
         return result;
     }
 
-    public FireflyAlgorithm(double[][] boundaries,int swarmSize, int maxIterations,
+    /**
+     * Construct a new firefly algorithm.
+     * @param boundaries boundaries of the search space
+     * @param swarmSize number of fireflies
+     * @param maxIterations maximum number of iterations over the swarm
+     * @param alpha maximum size of a random step
+     * @param beta coefficient of attraction
+     * @param gamma exponential decay of attraction over distance
+     * @param diff stopping-criterion - the method stops after the difference between the best and
+     *             the worst solution is less than diff
+     */
+    public FireflyAlgorithm(double[][] boundaries, int swarmSize, int maxIterations,
             double alpha, double beta, double gamma, double diff) {
         this.alpha = alpha;
         this.beta = beta;
@@ -45,8 +76,15 @@ public class FireflyAlgorithm extends OptimizationMethod {
         this.diff = diff;
     }
 
+    /**
+     * Default firefly algorithm constructor.
+     */
+    public FireflyAlgorithm() {
+        this(new double[][] {{-8, 8}, {-8, 8}}, 20, 15, 0.1, 1, 1, 0.1);
+    }
+
     @Override
-    protected Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
+    protected Point minimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
         r = new Random(System.currentTimeMillis());
         Firefly[] swarm = new Firefly[swarmSize];
         for (int i = 0; i < swarmSize; i++) {
@@ -72,7 +110,7 @@ public class FireflyAlgorithm extends OptimizationMethod {
                         darker = swarm[i];
                     }
                     double attraction = Math.exp(-gamma * swarm[i].distTo(swarm[j])) * beta;
-                    double[] move = randomMove(arity);
+                    double[] move = randomMove(arity, alpha);
                     for (int k = 0; k < arity; k++) {
                         darker.x[k] += attraction * (brighter.x[k] - darker.x[k]) + move[k];
                         darker.x[k] = Math.min(boundaries[k][1], Math.max(darker.x[k], boundaries[k][0]));

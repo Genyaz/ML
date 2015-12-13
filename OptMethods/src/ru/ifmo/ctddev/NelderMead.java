@@ -8,12 +8,30 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
+/**
+ * The optimization method based on the shrinking simplex.
+ * Current realization is written according to Wikipedia article
+ *
+ * https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
+ */
 public class NelderMead extends OptimizationMethod {
     private final double alpha, gamma, p, sigma, eps, diff;
     private final double[][] init;
-    private ExecutorService executorService;
     private final int threads;
 
+    /**
+     * Constructs a new Nelder-Mead method.
+     * @param alpha coefficient of reflection
+     * @param gamma coefficient of expansion
+     * @param p coeffictient of contraction
+     * @param sigma coefficient of reduction
+     * @param init initial simplex with (arity + 1) points, init[i][j] is the j-th coordinate of the i-th point
+     * @param eps stopping-criterion - the method stops after
+     *            the maximum distance between simplex's points is less than eps
+     * @param diff stopping-criterion - the method stops after
+     *             the difference between the best and the worst solution is less than diff
+     * @param threads number of additional threads, should be >= 1
+     */
     public NelderMead(double alpha, double gamma, double p,
                       double sigma, double[][] init, double eps, double diff, int threads) {
         this.alpha = alpha;
@@ -26,9 +44,16 @@ public class NelderMead extends OptimizationMethod {
         this.init = init;
     }
 
+    /**
+     * Default Nelder-Mead constructor.
+     */
+    public NelderMead() {
+        this(1, 2, -0.5, 0.5, new double[][]{{-8, 8}, {-8, -8}, {16, 0}}, 0.001, 0.05, 8);
+    }
+
     @Override
-    protected Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
-        executorService = Executors.newFixedThreadPool(threads);
+    protected Point minimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
+        ExecutorService executorService = Executors.newFixedThreadPool(threads);
         final CyclicBarrier cyclicBarrier = new CyclicBarrier(arity + 1, () -> {});
         Point[] points = new Point[arity + 1];
         for (int i = 0; i < arity + 1; i++) {

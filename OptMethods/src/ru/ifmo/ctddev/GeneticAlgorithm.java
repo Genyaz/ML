@@ -5,6 +5,12 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Function;
 
+/**
+ * The optimization method based on the natural selection.
+ * Current realization is written according to Wikipedia article
+ *
+ * https://en.wikipedia.org/wiki/Genetic_algorithm
+ */
 public class GeneticAlgorithm extends OptimizationMethod {
 
     protected final double[][] boundaries;
@@ -12,6 +18,17 @@ public class GeneticAlgorithm extends OptimizationMethod {
     protected final int populationSize;
     protected final Random r;
 
+    /**
+     * Constructs a new genetic algorithm.
+     * @param boundaries boundaries of the search space
+     * @param populationSize size of the population
+     * @param mutationCoef maximum random addition/subtraction to coordinate
+     * @param mutationRate chance of position's mutation
+     * @param selection fraction of the best of the population allowed for breeding
+     * @param elite fraction of the best of the population translated to the next generation
+     * @param diff stopping-criterion - the method stops after the difference between the best and
+     *             the worst solution is less than diff
+     */
     public GeneticAlgorithm(double[][] boundaries, int populationSize,
                             double mutationCoef, double mutationRate, double selection, double elite, double diff) {
         this.boundaries = boundaries;
@@ -24,6 +41,19 @@ public class GeneticAlgorithm extends OptimizationMethod {
         this.r = new Random(System.currentTimeMillis());
     }
 
+    /**
+     * Default genetic algorithm constructor.
+     */
+    public GeneticAlgorithm() {
+        this(new double[][]{{-8, 8}, {-8, 8}}, 20, 0.1, 0.1, 0.5, 0.1, 0.1);
+    }
+
+    /**
+     * Chooses parent from the breed with the probability proportional to
+     * the difference of quality between this individual and the worst.
+     * @param breeding breeding individuals
+     * @return chosen parent
+     */
     protected Point chooseParent(Point[] breeding) {
         double maxQuality = Double.MIN_VALUE;
         for (Point p : breeding) {
@@ -43,6 +73,12 @@ public class GeneticAlgorithm extends OptimizationMethod {
         return breeding[j];
     }
 
+    /**
+     * Crossovers two chromosomes with two-point crossover.
+     * @param x first parent
+     * @param y second parent
+     * @return crossovered chromosome
+     */
     protected double[] crossover(double[] x, double[] y) {
         int p1 = (int)(r.nextDouble() * x.length);
         int p2 = (int)(r.nextDouble() * x.length);
@@ -64,7 +100,14 @@ public class GeneticAlgorithm extends OptimizationMethod {
         return result;
     }
 
-    protected double[] mutate(double[] x) {
+    /**
+     * Mutates given chromosome with a chance of random addition to every coordinate.
+     * @param x chromosome
+     * @param mutationRate chance of position's mutation
+     * @param mutationCoef maximum random addition/subtraction to coordinate
+     * @return mutated chromosome
+     */
+    protected double[] mutate(double[] x, double mutationRate, double mutationCoef) {
         for (int i = 0; i < x.length; i++) {
             if (r.nextDouble() < mutationRate) {
                 x[i] += mutationCoef * 2 * (r.nextDouble() - 1);
@@ -74,7 +117,7 @@ public class GeneticAlgorithm extends OptimizationMethod {
     }
 
     @Override
-    protected Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
+    protected Point minimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
         Point[] population = new Point[populationSize];
         for (int i = 0; i < populationSize; i++) {
             double[] x = new double[arity];
@@ -99,7 +142,7 @@ public class GeneticAlgorithm extends OptimizationMethod {
             }
             for (int i = 0; i < populationSize - eliteSize; i++) {
                 Point parent1 = chooseParent(breeding), parent2 = chooseParent(breeding);
-                double[] x = mutate(crossover(parent1.x, parent2.x));
+                double[] x = mutate(crossover(parent1.x, parent2.x), mutationRate, mutationCoef);
                 nextGen[eliteSize + i] = new Point(x);
                 nextGen[eliteSize + i].quality = evaluator.apply(x);
             }

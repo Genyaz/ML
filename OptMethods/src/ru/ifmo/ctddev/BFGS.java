@@ -29,62 +29,33 @@ public class BFGS extends OptimizationMethod {
         return grad;
     }
 
-    protected double[] getDirection(double[][] b, double[] grad) {
-        int arity = grad.length;
-        double[] result = new double[arity];
-        for (int i = 0; i < arity; i++) {
-            for (int j = 0; j < arity; j++) {
-                result[i] -= b[i][j] * grad[j];
-            }
-        }
-        return result;
-    }
-
-    protected SmoothPoint getNextPoint(SmoothPoint p, double[] direction, Function<double[], Double> evaluator,
-            double maxStep, double tau, double c, double m) {
-        double step = maxStep;
-        double t = -c * m;
-        int arity = direction.length;
-        double[] newPoint = new double[arity];
-        while (true) {
-            for (int i = 0; i < arity; i++) {
-                newPoint[i] = p.x[i] + maxStep * direction[i];
-            }
-            double quality = evaluator.apply(newPoint);
-            if (p.quality - quality >= step * t) {
-                SmoothPoint result = new SmoothPoint(newPoint);
-                result.quality = quality;
-                return result;
-            } else {
-                step = step * tau;
-            }
-        }
-    }
-
     public BFGS(double[] init, double eps) {
         this.init = init;
         this.eps = eps;
     }
 
+    public BFGS() {
+        this(new double[] {2, 3}, 1e-3);
+    }
+
     @Override
-    protected Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
-        // B0 = I
-        double[][] b = new double[arity][arity];
-        for (int i = 0; i < arity; i++) {
-            b[i][i] = 1;
-        }
-        //x0 = init
-        SmoothPoint p = new SmoothPoint(Arrays.copyOf(init, arity));
-        p.quality = evaluator.apply(p.x);
-        p.grad = getGradient(evaluator, p);
+    protected Point minimize(final Function<double[], Double> evaluator, int arity, PrintStream out) {
+        Function<double[], Double> ev = doubles -> -evaluator.apply(doubles);
+        SmoothPoint point = new SmoothPoint(init);
+        point.quality = ev.apply(point.x);
+        point.grad = getGradient(ev, point);
+        double[] diag = new double[arity];
+        int[] iflag = new int[1];
         while (true) {
-            double m = 0;
-            double[] direction = getDirection(b, p.grad);
-            for (int i = 0; i < arity; i++) {
-                m += p.grad[i] * direction[i];
+            try {
+                LBFGSCP.lbfgs(arity, 3, point.x, point.quality, point.grad, false, diag, new int[] {-1, 0}, 1e-3, 1e-32, iflag);
+                double quality = ev.apply(point.x);
+                if (quality - point.quality < eps) return point;
+                point.quality = quality;
+                point.grad = getGradient(ev, point);
+            } catch (LBFGSCP.ExceptionWithIflag exceptionWithIflag) {
+                return point;
             }
-            SmoothPoint newPoint = getNextPoint(p, direction, evaluator, 1, 0.5, 0.5, m);
-            newPoint.grad = getGradient(evaluator, newPoint);
         }
     }
 

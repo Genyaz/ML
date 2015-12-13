@@ -52,7 +52,7 @@ public class LogisticRegression {
                 theta[j] -= alpha * grad[j];
             }
         }
-        System.out.println(Arrays.toString(theta));
+        //System.out.println(Arrays.toString(theta));
         return new LogisticRegression(theta, 0.5);
     }
 

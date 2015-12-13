@@ -4,17 +4,33 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.function.Function;
 
+/**
+ * The optimization method based on moving along axes with the given step.
+ */
 public class LocalSearch extends OptimizationMethod {
     private double step;
     private double[] init;
 
+
+    /**
+     * Constructs a new local search method.
+     * @param step size of step in any dimension
+     * @param init initial point in the search space
+     */
     public LocalSearch(double step, double[] init) {
         this.init = Arrays.copyOf(init, init.length);
         this.step = step;
     }
 
+    /**
+     * Default local search constructor.
+     */
+    public LocalSearch() {
+        this(0.1, new double[]{2, 2});
+    }
+
     @Override
-    protected Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
+    protected Point minimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
         Point best = new Point(init);
         best.quality = evaluator.apply(init);
         boolean improved = true;

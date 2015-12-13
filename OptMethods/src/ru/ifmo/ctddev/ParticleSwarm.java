@@ -5,14 +5,34 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Function;
 
+/**
+ * The optimization method based on the behaviour of flying particles attracted to some points.
+ * Current realization is written according to Wikipedia article
+ *
+ * https://en.wikipedia.org/wiki/Particle_swarm_optimization
+ *
+ * You can learn more about tweaking parameters in the article
+ *
+ * http://hvass-labs.org/people/magnus/publications/pedersen10good-pso.pdf
+ */
 public class ParticleSwarm extends OptimizationMethod {
 
     private final double omega, phiP, phiG, diff;
     private final double[][] boundaries;
     private final int swarmSize;
 
+    /**
+     * Represents a flying particle.
+     */
     protected static class Particle extends Point {
+        /**
+         * The particle's speed.
+         */
         private double[] v;
+
+        /**
+         * The best point found by the article
+         */
         private Point bestKnown;
 
         public Particle(double[] x, double[] v) {
@@ -22,8 +42,18 @@ public class ParticleSwarm extends OptimizationMethod {
         }
     }
 
-    public ParticleSwarm(double omega, double phiP, double phiG, double[][] boundaries,
-                         int swarmSize, double diff) {
+    /**
+     * Constructs a new particle swarm.
+     * @param boundaries boundaries of the search space
+     * @param swarmSize number of particles
+     * @param omega decay of particles' speed over time
+     * @param phiP attraction to the best local point
+     * @param phiG attraction to the best global point
+     * @param diff the stopping-criterion - method stops after the difference between the best and
+     *             the worst solution is less than diff
+     */
+    public ParticleSwarm(double[][] boundaries, int swarmSize, double omega,
+            double phiP, double phiG, double diff) {
         this.omega = omega;
         this.phiP = phiP;
         this.phiG = phiG;
@@ -32,8 +62,15 @@ public class ParticleSwarm extends OptimizationMethod {
         this.diff = diff;
     }
 
+    /**
+     * Default particle swarm constructor.
+     */
+    public ParticleSwarm() {
+        this(new double[][]{{-8, 8}, {-8, 8}}, 4, 0.6, 0.4, 1.4, 0.1);
+    }
+
     @Override
-    protected Point optimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
+    protected Point minimize(Function<double[], Double> evaluator, int arity, PrintStream out) {
         Random r = new Random(System.currentTimeMillis());
         Particle[] swarm = new Particle[swarmSize];
         Point best = null;
