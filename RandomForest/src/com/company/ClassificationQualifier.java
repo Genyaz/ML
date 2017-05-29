@@ -1,9 +1,8 @@
 package com.company;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class Qualifier {
+public class ClassificationQualifier {
     public static class Error {
         public int tp, tn, fp, fn;
 
@@ -18,17 +17,17 @@ public class Qualifier {
             return new Error(this.tp + error.tp, this.tn + error.tn, this.fp + error.fp, this.fn + error.fn);
         }
     }
-    public static Error getError(RandomForest randomForest, List<double[]> test) {
+    public static Error getError(ClassificationRandomForest classificationRandomForest, List<double[]> test) {
         int tp = 0, tn = 0, fn = 0, fp = 0;
         for (double[] x: test) {
             if (x[x.length - 1] < 0) {
-                if (randomForest.classify(x) < 0) {
+                if (classificationRandomForest.classify(x) < 0) {
                     tn++;
                 } else {
                     fp++;
                 }
             } else {
-                if (randomForest.classify(x) < 0) {
+                if (classificationRandomForest.classify(x) < 0) {
                     fn++;
                 } else {
                     tp++;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DecisionTree {
+public class ClassificationDecisionTree {
     public static enum Criterion {
         Gini {
             @Override
@@ -43,11 +43,11 @@ public class DecisionTree {
 
     private int variable;
     private double value;
-    private DecisionTree left, right;
+    private ClassificationDecisionTree left, right;
     private final int[] classified;
     private final int size;
 
-    public DecisionTree(List<double[]> data, Criterion criterion, int maxDepth) {
+    public ClassificationDecisionTree(List<double[]> data, Criterion criterion, int maxDepth) {
         size = data.size();
         classified = new int[2];
         for (double[] d : data) {
@@ -109,8 +109,8 @@ public class DecisionTree {
                     toRight.add(d);
                 }
             }
-            left = new DecisionTree(toLeft, criterion, maxDepth - 1);
-            right = new DecisionTree(toRight, criterion, maxDepth - 1);
+            left = new ClassificationDecisionTree(toLeft, criterion, maxDepth - 1);
+            right = new ClassificationDecisionTree(toRight, criterion, maxDepth - 1);
         }
     }
 
